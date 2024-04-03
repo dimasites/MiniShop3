@@ -23,7 +23,7 @@ Ext.extend(ms3.window.CreateExtraField, ms3.window.Default, {
                 id: config.id + '-id'
             }, {
                 xtype: 'ms3-combo-combobox-default',
-                fieldLabel: 'class',//_('ms3_class'),
+                fieldLabel: _('ms3_extrafields_class'),
                 name: 'class',
                 hiddenName: 'class',
                 anchor: '99%',
@@ -49,7 +49,7 @@ Ext.extend(ms3.window.CreateExtraField, ms3.window.Default, {
                     defaults: { msgTarget: 'under' },
                     items: [{
                         xtype: 'textfield',
-                        fieldLabel: 'key',//_('ms3_key'),
+                        fieldLabel: _('ms3_extrafields_key'),
                         name: 'key',
                         anchor: '99%',
                         id: config.id + '-key',
@@ -61,7 +61,7 @@ Ext.extend(ms3.window.CreateExtraField, ms3.window.Default, {
                     layout: 'form',
                     items: [{
                         xtype: 'textfield',
-                        fieldLabel: 'label',//_('ms3_key'),
+                        fieldLabel: _('ms3_extrafields_label'),
                         name: 'label',
                         anchor: '99%',
                         id: config.id + '-label',
@@ -95,7 +95,7 @@ Ext.extend(ms3.window.CreateExtraField, ms3.window.Default, {
                 value: false
             }, {
                 xtype: 'fieldset',
-                title: 'Создать колонку в БД',//_('ms3_key'),
+                title: _('ms3_extrafields_create'),
                 layout: 'column',
                 defaults: { msgTarget: 'under', border: false },
                 checkboxToggle: !existsInDatabase,
@@ -127,7 +127,7 @@ Ext.extend(ms3.window.CreateExtraField, ms3.window.Default, {
                             defaults: { msgTarget: 'under' },
                             items: [{
                                 xtype: 'ms3-combo-combobox-default',
-                                fieldLabel: 'dbtype',//_('ms3_class'),
+                                fieldLabel: _('ms3_extrafields_dbtype'),
                                 name: 'dbtype',
                                 hiddenName: 'dbtype',
                                 anchor: '99%',
@@ -169,7 +169,7 @@ Ext.extend(ms3.window.CreateExtraField, ms3.window.Default, {
                             layout: 'form',
                             items: [{
                                 xtype: 'textfield',
-                                fieldLabel: 'precision',//_('ms3_key'),
+                                fieldLabel: _('ms3_extrafields_precision'),
                                 name: 'precision',
                                 anchor: '99%',
                                 id: config.id + '-precision',
@@ -181,13 +181,12 @@ Ext.extend(ms3.window.CreateExtraField, ms3.window.Default, {
                             layout: 'form',
                             items: [{
                                 xtype: 'ms3-combo-combobox-default',
-                                fieldLabel: 'phptype',//_('ms3_class'),
+                                fieldLabel: _('ms3_extrafields_phptype'),
                                 name: 'phptype',
                                 hiddenName: 'phptype',
                                 anchor: '99%',
                                 id: config.id + '-phptype',
                                 allowBlank: true,
-                                //disabled: existsInDatabase,
                                 mode: 'local',
                                 displayField: 'value',
                                 valueField: 'value',
@@ -213,7 +212,7 @@ Ext.extend(ms3.window.CreateExtraField, ms3.window.Default, {
                             defaults: { msgTarget: 'under' },
                             items: [{
                                 xtype: 'ms3-combo-combobox-default',
-                                fieldLabel: 'attributes',//_('ms3_class'),
+                                fieldLabel: _('ms3_extrafields_attributes'),
                                 name: 'attributes',
                                 hiddenName: 'attributes',
                                 anchor: '99%',
@@ -240,7 +239,7 @@ Ext.extend(ms3.window.CreateExtraField, ms3.window.Default, {
                             layout: 'form',
                             items: [{
                                 xtype: 'ms3-combo-combobox-default',
-                                fieldLabel: 'default',//_('ms3_class'),
+                                fieldLabel: _('ms3_extrafields_default'),
                                 name: 'default',
                                 hiddenName: 'default',
                                 anchor: '99%',
@@ -278,7 +277,7 @@ Ext.extend(ms3.window.CreateExtraField, ms3.window.Default, {
                             layout: 'form',
                             items: [{
                                 xtype: 'textfield',
-                                fieldLabel: 'default_value',//_('ms3_key'),
+                                fieldLabel: _('ms3_extrafields_default_value'),
                                 name: 'default_value',
                                 anchor: '99%',
                                 id: config.id + '-default_value',
@@ -288,8 +287,8 @@ Ext.extend(ms3.window.CreateExtraField, ms3.window.Default, {
                         }]
                     }, {
                         xtype: 'xcheckbox',
-                        fieldLabel: 'null',//_('ms3_key'),
-                        boxLabel: 'null 2',//_('ms3_key'),
+                        //fieldLabel: _('ms3_extrafields_null'),
+                        boxLabel: _('ms3_extrafields_null'),
                         name: 'null',
                         anchor: '99%',
                         id: config.id + '-null',

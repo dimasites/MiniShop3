@@ -43,8 +43,7 @@ class Get extends GetProcessor
         $this->object->set('exists',  $exists);
         $existsMessage = '';
         if ($exists) {
-            $existsMessageTpl = 'Столбец <strong>%s</strong> существует в таблице <strong>%s</strong>, редактирование большинства полей недоступно.';
-            $existsMessage = sprintf($existsMessageTpl, $columnName, $table);
+            $existsMessage = $this->modx->lexicon('ms3_extrafields_exists_msg', ['column' => $columnName, 'table' =>$table]);
         }
         $this->object->set('exists_message', $existsMessage);
 

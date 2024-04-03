@@ -40,18 +40,17 @@ ms3.panel.Utilities = function (config) {
                 }]
             },
             {
-                title: 'Расширение объектов', //_('ms3_utilities_import'),
+                title: _('ms3_extrafields'),
                 layout: 'form',
                 autoHeight: true,
                 items: [{
-                    html: 'Здесь вы можете создать дополнительные поля для объектов MiniShop3', //_('ms3_utilities_import_intro'),
+                    html: _('ms3_extrafields_intro'),
                     bodyCssClass: 'panel-desc',
                 }, {
                     layout: 'border',
                     id: 'ms3-tree-panel-extrafield',
                     height: 500,
                     flex: 0,
-                    //autoHeight: true,
                     border: false,
                     defaults: {
                         border: false,
@@ -82,10 +81,7 @@ ms3.panel.Utilities = function (config) {
                             cls: 'main-wrapper'
                         }
                     ]
-                }/*, {
-                    xtype: 'ms3-grid-extrafields',
-                    cls: 'main-wrapper',
-                }*/]
+                }]
             }
             ]
         }]

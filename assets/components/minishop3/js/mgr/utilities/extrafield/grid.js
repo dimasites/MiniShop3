@@ -39,34 +39,34 @@ Ext.extend(ms3.grid.ExtraField, ms3.grid.Default, {
                 width: 50,
                 sortable: true
             }, {
-                header: 'class', //_('ms3_class'),
+                header: _('ms3_extrafields_class'),
                 dataIndex: 'class',
                 width: 150,
                 sortable: true,
                 hidden: true
             }, {
-                header: 'key', //_('ms3_key'),
+                header: _('ms3_extrafields_key'),
                 dataIndex: 'key',
                 width: 100,
                 sortable: true
             }, {
-                header: 'label', //_('ms3_label'),
+                header: _('ms3_extrafields_label'),
                 dataIndex: 'label',
                 width: 100,
                 sortable: true
             }, {
-                header: 'dbtype', //_('ms3_label'),
+                header: _('ms3_extrafields_dbtype'),
                 dataIndex: 'dbtype',
                 width: 100,
                 sortable: true
             }, {
-                header: 'exists in db', //_('ms3_active'),
+                header: _('ms3_extrafields_exists'),
                 dataIndex: 'exists',
                 width: 80,
                 sortable: true,
                 renderer: ms3.utils.renderBoolean
             }, {
-                header: 'active', //_('ms3_active'),
+                header: _('ms3_active'),
                 dataIndex: 'active',
                 width: 80,
                 sortable: true,
