@@ -548,9 +548,11 @@
         <field key="default" dbtype="varchar" precision="191" phptype="string" null="true" default=""/>
         <field key="default_value" dbtype="varchar" precision="191" phptype="string" null="true" default=""/>
         <field key="attributes" dbtype="varchar" precision="191" phptype="string" null="true" default=""/>
-        
-        <!--TODO: index-->
 
         <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="0"/>
+
+        <index alias="active" name="active" primary="false" unique="false" type="BTREE">
+            <column key="active" length="" collation="A" null="false"/>
+        </index>
     </object>
 </model>
