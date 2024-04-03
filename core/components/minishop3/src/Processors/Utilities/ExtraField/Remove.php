@@ -28,7 +28,7 @@ class Remove extends RemoveProcessor
     public function afterRemove()
     {
         $extraFields = new ExtraFields($this->modx);
-        $extraFields->deleteCache();
+        $extraFields->clearCache();
 
         return parent::afterRemove();
     }

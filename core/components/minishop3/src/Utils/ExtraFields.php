@@ -20,6 +20,11 @@ class ExtraFields
         $this->modx = $modx;
     }
 
+    /**
+     * Adds extra fields to the xPDO map
+     *
+     * @return void
+     */
     public function loadMap()
     {
         if (!$fieldsMeta = $this->modx->cacheManager->get($this->cacheKey, $this->cacheOptions)) {
@@ -27,22 +32,34 @@ class ExtraFields
             $c = $this->modx->newQuery(msExtraField::class, ['active' => 1]);
             $fields = $this->modx->getIterator(msExtraField::class, $c);
             foreach ($fields as $field) {
-                $fieldsMeta[] = $this->getExtraFieldMeta($field);
+                $fieldsMeta[] = $this->getFieldInfo($field);
             }
             $this->modx->cacheManager->add($this->cacheKey, $fieldsMeta, 0, $this->cacheOptions);
         }
 
         foreach ($fieldsMeta as $fieldMeta) {
-            $this->addFieldMetaToMap($fieldMeta);
+            $this->addFieldToMap($fieldMeta);
         }
     }
 
-    // TODO: Проверить, что при общей очистке кеша MODx этот метод тоже нужно вызвать
-    public function deleteCache()
+    /**
+     * Clears cache
+     *
+     * @return void
+     */
+    public function clearCache()
     {
+        // TODO: [apha] Проверить, что при общей очистке кеша MODx этот метод сработает
         $this->modx->cacheManager->delete($this->cacheKey, $this->cacheOptions);
     }
 
+    /**
+     * Checks that a column exists in a table
+     *
+     * @param string $class
+     * @param string $columnName
+     * @return boolean
+     */
     public function columnExists(string $class, string $columnName): bool
     {
         if (!empty($class)) {
@@ -63,11 +80,17 @@ class ExtraFields
         return false;
     }
 
-    public function createColumn(msExtraField $msExtraField): bool
+    /**
+     * Adds a column to a table
+     *
+     * @param msExtraField $msExtraField
+     * @return boolean
+     */
+    public function addColumn(msExtraField $msExtraField): bool
     {
-        $meta = $this->getExtraFieldMeta($msExtraField);
+        $meta = $this->getFieldInfo($msExtraField);
         if ($meta) {
-            $this->addFieldMetaToMap($meta);
+            $this->addFieldToMap($meta);
 
             $xpdoManager = $this->modx->getManager();
             return $xpdoManager->addField($msExtraField->get('class'), $msExtraField->get('key'));
@@ -76,7 +99,13 @@ class ExtraFields
         return false;
     }
 
-    private function addFieldMetaToMap(array $meta)
+    /**
+     * Adds a field to the xPDO map
+     *
+     * @param array $meta
+     * @return void
+     */
+    private function addFieldToMap(array $meta)
     {
         $class = $meta['class'];
         $field = $meta['field'];
@@ -89,12 +118,12 @@ class ExtraFields
     }
 
     /**
-     * Prepares metadata for the specified field
+     * Prepares field info with metadata
      *
      * @param msExtraField $field
      * @return null|array
      */
-    private function getExtraFieldMeta(msExtraField $field): mixed
+    private function getFieldInfo(msExtraField $field): mixed
     {
         if ($field == null || !($field instanceof msExtraField)) {
             return null;

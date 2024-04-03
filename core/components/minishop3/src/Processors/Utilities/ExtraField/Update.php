@@ -100,7 +100,7 @@ class Update extends UpdateProcessor
             $key = $this->object->get('key');
             // TODO: Не однозначное поведение, если в базе существует столбец, а пользователь создаст с другим dbtype
             if (!$this->extraFields->columnExists($class, $key)) {
-                if (!$this->extraFields->createColumn($this->object)) {
+                if (!$this->extraFields->addColumn($this->object)) {
                     // TODO: заменить текст ошибки на "Ошибка добавления поля"
                     $this->modx->error->addField('key', $this->modx->lexicon('ms3_err_unknown'));
                 }
@@ -112,7 +112,7 @@ class Update extends UpdateProcessor
 
     public function afterSave()
     {
-        $this->extraFields->deleteCache();
+        $this->extraFields->clearCache();
         return parent::afterSave();
     }
 
