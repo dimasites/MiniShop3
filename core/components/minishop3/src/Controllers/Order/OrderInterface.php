@@ -21,9 +21,9 @@ interface OrderInterface
      * @param string $key Name of the field
      * @param string $value .Value of the field
      *
-     * @return boolean
+     * @return array
      */
-    public function add(string $key, mixed $value): bool;
+    public function add(string $key, mixed $value): array;
 
     /**
      * Validates field before it set

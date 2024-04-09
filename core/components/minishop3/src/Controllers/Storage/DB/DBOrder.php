@@ -9,11 +9,16 @@ use MiniShop3\Model\msOrderAddress;
 use MiniShop3\Model\msPayment;
 use MODX\Revolution\modX;
 use MiniShop3\Controllers\Order\OrderInterface;
+use Rakit\Validation\Validator;
 
 class DBOrder extends DBStorage implements OrderInterface
 {
     private $config;
     private $order;
+
+    protected $validationRules = [];
+    protected $validationMessages = [];
+    protected $deliverValidationRules;
 
     /**
      * @param string $token
@@ -27,6 +32,12 @@ class DBOrder extends DBStorage implements OrderInterface
         }
         $this->token = $token;
         $this->config = $config;
+        if (!empty($_SESSION['ms3']['validation']['rules'])) {
+            $this->validationRules = $_SESSION['ms3']['validation']['rules'];
+        }
+        if (!empty($_SESSION['ms3']['validation']['messages'])) {
+            $this->validationMessages = $_SESSION['ms3']['validation']['messages'];
+        }
         return true;
     }
 
@@ -146,8 +157,14 @@ class DBOrder extends DBStorage implements OrderInterface
         );
     }
 
-    public function add($key, $value = ''): bool
+    public function add(string $key, mixed $value = null): array
     {
+        if (empty($this->order)) {
+            $response = $this->get();
+            if ($response['success']) {
+                $this->order = $response['data']['order'];
+            }
+        }
         $response = $this->ms3->utils->invokeEvent('msOnBeforeAddToOrder', [
             'key' => $key,
             'value' => $value,
@@ -159,33 +176,59 @@ class DBOrder extends DBStorage implements OrderInterface
         $value = $response['data']['value'];
 
         if (empty($value)) {
-            $validated = '';
-            $this->order = $this->add($key);
-        } else {
-            $validated = $this->validate($key, $value);
-            if ($validated !== false) {
-                $this->order = $this->add($key, $validated);
-                $response = $this->ms3->utils->invokeEvent('msOnAddToOrder', [
-                    'key' => $key,
-                    'value' => $validated,
-                    'controller' => $this,
-                ]);
-                if (!$response['success']) {
-                    return $this->error($response['message']);
-                }
-                $validated = $response['data']['value'];
-            } else {
-                $this->order = $this->add($key);
+            $this->remove($key);
+            return $this->success('', [$key => null]);
+        }
+        $validateResponse = $this->validate($key, $value);
+        if ($validateResponse['success']) {
+            $validated = $validateResponse['data']['value'];
+            $response = $this->ms3->utils->invokeEvent('msOnAddToOrder', [
+                'key' => $key,
+                'value' => $validated,
+                'controller' => $this,
+            ]);
+            if (!$response['success']) {
+                return $this->error($response['message']);
+            }
+            $validated = $response['data']['value'];
+            $this->updateDraft($key, $validated);
+
+            return $this->success('', [$key => $validated]);
+        }
+        $this->updateDraft($key);
+        return $this->error($validateResponse['data']['error'][$key], [$key => null]);
+    }
+
+    public function validate(string $key, mixed $value): mixed
+    {
+        if (empty($this->order)) {
+            $response = $this->get();
+            if ($response['success']) {
+                $this->order = $response['data']['order'];
+            }
+        }
+        //TODO реализовать use custom validation rule для проверки существования payment, delivery,
+        // для показа уникального message
+        $this->validationRules = [
+            'delivery_id' => 'required|numeric',
+            'payment_id' => 'required|numeric',
+        ];
+
+        $this->validationMessages = [
+            'required' => 'Обязательно для заполнения',
+            'numeric' => 'Требуется число',
+            'min' => 'Минимум :min символов',
+            'email' => 'Email заполнен некорректно'
+        ];
+
+        if (!empty($this->order['delivery_id']) && empty($this->deliverValidationRules)) {
+            $response = $this->getDeliverValidationRules($this->order['delivery_id']);
+            if (!empty($response)) {
+                $this->deliverValidationRules = $response;
+                $this->validationRules = array_merge($this->validationRules, $this->deliverValidationRules);
             }
         }
 
-        return ($validated === false)
-            ? $this->error('', [$key => $value])
-            : $this->success('', [$key => $validated]);
-    }
-
-    public function validate($key, $value): mixed
-    {
         $eventParams = [
             'key' => $key,
             'value' => $value,
@@ -194,19 +237,57 @@ class DBOrder extends DBStorage implements OrderInterface
         $response = $this->invokeEvent('msOnBeforeValidateOrderValue', $eventParams);
         $value = $response['data']['value'];
 
-        //TODO Validate with delivery's validation riles
+        if (!isset($this->validationRules[$key])) {
+            return $this->success('', [
+                'value' => $response['data']['value']
+            ]);
+        }
 
-        $eventParams = [
-            'key' => $key,
-            'value' => $value,
-            'controller' => $this,
-        ];
-        $response = $this->invokeEvent('msOnValidateOrderValue', $eventParams);
-        return $response['data']['value'];
+        $validator = new Validator();
+
+        $validation = $validator->validate(
+            [$key => $value],
+            [$key => $this->validationRules[$key]],
+            $this->validationMessages
+        );
+
+        $validation->validate();
+
+        if ($validation->fails()) {
+            $errors = $validation->errors();
+            $eventParams = [
+                'key' => $key,
+                'value' => $value,
+                'error' => $errors->firstOfAll(),
+                'controller' => $this,
+            ];
+            $response = $this->invokeEvent('msOnErrorValidateOrderValue', $eventParams);
+            if (!empty($response['data']['error'])) {
+                return $this->error('', [
+                    'error' => $response['data']['error']
+                ]);
+            }
+        } else {
+            $eventParams = [
+                'key' => $key,
+                'value' => $value,
+                'controller' => $this,
+            ];
+            $response = $this->invokeEvent('msOnValidateOrderValue', $eventParams);
+        }
+        return $this->success('', [
+            'value' => $response['data']['value']
+        ]);
     }
 
     public function remove($key): bool
     {
+        if (empty($this->order)) {
+            $response = $this->get();
+            if ($response['success']) {
+                $this->order = $response['data']['order'];
+            }
+        }
         if ($exists = array_key_exists($key, $this->order)) {
             $response = $this->ms3->utils->invokeEvent('msOnBeforeRemoveFromOrder', [
                 'key' => $key,
@@ -216,6 +297,7 @@ class DBOrder extends DBStorage implements OrderInterface
                 return $this->error($response['message']);
             }
 
+            //TODO тут не должно быть рекурсии. Очистить поле в базе и памяти
             $this->order = $this->remove($key);
             $response = $this->ms3->utils->invokeEvent('msOnRemoveFromOrder', [
                 'key' => $key,
@@ -231,6 +313,12 @@ class DBOrder extends DBStorage implements OrderInterface
 
     public function set(array $order): array
     {
+        if (empty($this->order)) {
+            $response = $this->get();
+            if ($response['success']) {
+                $this->order = $response['data']['order'];
+            }
+        }
         //TODO учесть поля Customer
         foreach ($order as $key => $value) {
             $this->add($key, $value);
@@ -241,11 +329,23 @@ class DBOrder extends DBStorage implements OrderInterface
 
     public function submit(): array
     {
+        if (empty($this->order)) {
+            $response = $this->get();
+            if ($response['success']) {
+                $this->order = $response['data']['order'];
+            }
+        }
         return [];
     }
 
     public function clean(): bool
     {
+        if (empty($this->order)) {
+            $response = $this->get();
+            if ($response['success']) {
+                $this->order = $response['data']['order'];
+            }
+        }
         return true;
     }
 
@@ -271,5 +371,45 @@ class DBOrder extends DBStorage implements OrderInterface
         $this->draft->set('delivery_cost', $delivery_cost);
         $this->draft->set('cost', $cost);
         $this->draft->save();
+    }
+
+    protected function getDeliverValidationRules($delivery_id)
+    {
+        $q = $this->modx->newQuery(msDelivery::class);
+        $q->where([
+            'id' => $delivery_id,
+            'active' => 1
+        ]);
+        $q->select('validation_rules');
+        $q->prepare();
+        $q->stmt->execute();
+        $rules = $q->stmt->fetch(\PDO::FETCH_COLUMN);
+        if (empty($rules)) {
+            return [];
+        }
+        $rules = json_decode($rules, true);
+        if (!is_array($rules)) {
+            return [];
+        }
+        return $rules;
+    }
+
+    protected function updateDraft(string $key, mixed $value = null): bool
+    {
+        if (in_array($key, array_keys($this->draft->_fields))) {
+            $this->draft->set($key, $value);
+            $this->draft->set('updatedon', time());
+            $this->draft->save();
+            return true;
+        }
+        if (in_array($key, array_keys($this->draft->Address->_fields))) {
+            $this->draft->Address->set($key, $value);
+            $this->draft->Address->save();
+            $this->draft->set('updatedon', time());
+            $this->draft->save();
+            return true;
+        }
+        // check msCustomer
+        return false;
     }
 }
