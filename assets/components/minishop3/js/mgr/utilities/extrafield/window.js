@@ -22,25 +22,33 @@ Ext.extend(ms3.window.CreateExtraField, ms3.window.Default, {
                 name: 'id',
                 id: config.id + '-id'
             }, {
-                xtype: 'ms3-combo-combobox-default',
-                fieldLabel: _('ms3_extrafields_class'),
-                name: 'class',
-                hiddenName: 'class',
-                anchor: '99%',
-                id: config.id + '-class',
-                allowBlank: true,
-                disabled: existsInDatabase,
-                mode: 'local',
-                displayField: 'class',
-                valueField: 'class',
-                store: new Ext.data.ArrayStore({
-                    id: 0,
-                    fields: ['class'],
-                    data: [
-                        ['MiniShop3\\Model\\msProductData'],
-                        ['MiniShop3\\Model\\msVendor']
-                    ]
-                }),
+                layout: 'column',
+                items: [{
+                    columnWidth: 1,
+                    layout: 'form',
+                    defaults: { msgTarget: 'under' },
+                    items: [{
+                        xtype: 'ms3-combo-combobox-default',
+                        fieldLabel: _('ms3_extrafields_class'),
+                        name: 'class',
+                        hiddenName: 'class',
+                        anchor: '99%',
+                        id: config.id + '-class',
+                        allowBlank: true,
+                        disabled: existsInDatabase,
+                        mode: 'local',
+                        displayField: 'class',
+                        valueField: 'class',
+                        store: new Ext.data.ArrayStore({
+                            id: 0,
+                            fields: ['class'],
+                            data: [
+                                ['MiniShop3\\Model\\msProductData'],
+                                ['MiniShop3\\Model\\msVendor']
+                            ]
+                        }),
+                    }],
+                }]
             }, {
                 layout: 'column',
                 items: [{
@@ -57,19 +65,33 @@ Ext.extend(ms3.window.CreateExtraField, ms3.window.Default, {
                         disabled: existsInDatabase,
                     }],
                 }, {
-                    columnWidth: .33,
+                    columnWidth: .41,
                     layout: 'form',
                     items: [{
-                        xtype: 'textfield',
-                        fieldLabel: _('ms3_extrafields_label'),
-                        name: 'label',
+                        xtype: 'ms3-combo-combobox-default',
+                        fieldLabel: _('ms3_extrafields_xtype'),
+                        name: 'xtype',
+                        hiddenName: 'xtype',
                         anchor: '99%',
-                        id: config.id + '-label',
+                        id: config.id + '-xtype',
                         allowBlank: true,
-                        disabled: existsInDatabase,
+                        editable: true,
+                        forceSelection: false,
+                        //disabled: existsInDatabase,
+                        mode: 'local',
+                        displayField: 'value',
+                        valueField: 'value',
+                        store: new Ext.data.ArrayStore({
+                            id: 0,
+                            fields: ['value'],
+                            data: [
+                                ['textfield'],
+                                ['textarea']
+                            ]
+                        }),
                     }],
                 }, {
-                    columnWidth: .33,
+                    columnWidth: .25,
                     layout: 'form',
                     items: [{
                         xtype: 'xcheckbox',
@@ -80,6 +102,34 @@ Ext.extend(ms3.window.CreateExtraField, ms3.window.Default, {
                         id: config.id + '-active',
                         style: { paddingTop: '10px' },
                         disabled: !existsInDatabase,
+                    }],
+                }]
+            }, {
+                layout: 'column',
+                items: [{
+                    columnWidth: .33,
+                    layout: 'form',
+                    defaults: { msgTarget: 'under' },
+                    items: [{
+                        xtype: 'textfield',
+                        fieldLabel: _('ms3_extrafields_label'),
+                        name: 'label',
+                        anchor: '99%',
+                        id: config.id + '-label',
+                        allowBlank: true,
+                        //disabled: existsInDatabase,
+                    }],
+                }, {
+                    columnWidth: .66,
+                    layout: 'form',
+                    items: [{
+                        xtype: 'textfield',
+                        fieldLabel: _('ms3_extrafields_description'),
+                        name: 'description',
+                        anchor: '99%',
+                        id: config.id + '-description',
+                        allowBlank: true,
+                        //disabled: existsInDatabase,
                     }],
                 }]
             }, {
@@ -95,7 +145,7 @@ Ext.extend(ms3.window.CreateExtraField, ms3.window.Default, {
                 value: false
             }, {
                 xtype: 'fieldset',
-                title: _('ms3_extrafields_create'),
+                title: existsInDatabase ? _('ms3_extrafields_created') : _('ms3_extrafields_create'),
                 layout: 'column',
                 defaults: { msgTarget: 'under', border: false },
                 checkboxToggle: !existsInDatabase,
