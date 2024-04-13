@@ -6,6 +6,7 @@ const ms3 = {
         ms3.form.init()
         ms3.cart.init()
         ms3.customer.init()
+        ms3.order.init()
     },
     checkToken () {
         let ms3TokenJson = localStorage.getItem(ms3.config.tokenName)

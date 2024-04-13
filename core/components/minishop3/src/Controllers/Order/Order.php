@@ -52,9 +52,9 @@ class Order implements OrderInterface
      * @param bool $with_cart
      * @param bool $only_cost
      *
-     * @return array|string
+     * @return array
      */
-    public function getCost($with_cart = true, $only_cost = false): array
+    public function getCost(bool $with_cart = true, bool $only_cost = false): array
     {
         return $this->storage->getCost($with_cart, $only_cost);
     }
@@ -63,9 +63,9 @@ class Order implements OrderInterface
      * @param string $key
      * @param string $value
      *
-     * @return array|string
+     * @return array
      */
-    public function add($key, $value = ''): bool
+    public function add(string $key, mixed $value = null): array
     {
         return $this->storage->add($key, $value);
     }

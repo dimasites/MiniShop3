@@ -248,7 +248,9 @@ return [
             "[[+jsUrl]]web\/modules\/form.js",
             "[[+jsUrl]]web\/modules\/request.js", 
             "[[+jsUrl]]web\/modules\/callback.js", 
-            "[[+jsUrl]]web\/modules\/cart.js"
+            "[[+jsUrl]]web\/modules\/cart.js",
+            "[[+jsUrl]]web\/modules\/customer.js",
+            "[[+jsUrl]]web\/modules\/order.js"
         ]',
         'xtype' => 'textarea',
         'area' => 'ms3_frontend',
