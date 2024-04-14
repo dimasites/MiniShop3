@@ -27,6 +27,8 @@ const ms3 = {
         if (now.getTime() > parseInt(ms3TokenData.expiry)) {
             localStorage.removeItem(ms3.config.tokenName)
             ms3.setToken()
+        } else {
+            ms3.updateToken()
         }
     },
     async setToken () {
@@ -34,6 +36,20 @@ const ms3 = {
         const formData = new FormData()
         formData.append('ms3_action', 'customer/token/get')
         const response = await this.request.get(formData)
+        if (response.success === true) {
+            const now = new Date()
+            const tokenData = {
+                token: response.data.token,
+                expiry: now.getTime() + parseInt(response.data.lifetime)
+            }
+            localStorage.setItem(ms3.config.tokenName, JSON.stringify(tokenData))
+        }
+    },
+    async updateToken () {
+        this.request.setHeaders()
+        const formData = new FormData()
+        formData.append('ms3_action', 'customer/token/update')
+        const response = await this.request.post(formData)
         if (response.success === true) {
             const now = new Date()
             const tokenData = {

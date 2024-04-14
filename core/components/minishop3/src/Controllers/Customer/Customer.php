@@ -69,6 +69,15 @@ class Customer
         return $this->success('', compact('token', 'lifetime'));
     }
 
+    public function updateToken($token)
+    {
+        if (empty($token)) {
+            return false;
+        }
+        $this->token = $token;
+        $_SESSION['ms3']['customer_token'] = $token;
+    }
+
     public function registerValidation($rules = [], $messages = [])
     {
         $this->validationRules = [
