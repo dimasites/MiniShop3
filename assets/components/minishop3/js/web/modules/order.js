@@ -8,7 +8,7 @@ ms3.order = {
         }
     },
     formListener (customerForm) {
-        const inputs = customerForm.querySelectorAll('input, textarea')
+        const inputs = customerForm.querySelectorAll('input, textarea, select')
         if (inputs.length > 0) {
             inputs.forEach(input => {
                 ms3.order.changeInputListener(input)
@@ -18,20 +18,22 @@ ms3.order = {
     changeInputListener (input) {
         input.addEventListener('change', async () => {
             const form = input.closest('.ms3_order_form')
-            form.classList.remove('was-validated')
+            const parent = input.closest('div')
+            parent.classList.remove('was-validated')
             input.classList.remove('is-invalid')
-            input.closest('div').querySelector('.invalid-feedback').textContent = ''
+            parent.querySelector('.invalid-feedback').textContent = ''
             const formData = new FormData()
             formData.append('key', input.name)
             formData.append('value', input.value)
             const response = await ms3.order.add(formData)
             if (response.success === true) {
-                form.classList.add('was-validated')
+                parent.classList.add('was-validated')
                 //TODO не менять radio, checkbox, select
                 input.value = response.data[input.name]
             } else {
+                parent.classList.add('was-validated')
                 input.classList.add('is-invalid')
-                input.closest('div').querySelector('.invalid-feedback').textContent = response.message
+                parent.querySelector('.invalid-feedback').textContent = response.message
             }
         })
     },
