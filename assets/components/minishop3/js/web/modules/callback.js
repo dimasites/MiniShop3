@@ -1,16 +1,16 @@
 ms3.callback = {
-    cart: {
-        render: function (response) {
-            for (let key in response.data.render.cart) {
-                const renderItem = response.data.render.cart[key]
-                const selector = renderItem.selector
-                const htmlRender = renderItem.render
+  cart: {
+    render: function (response) {
+      const cartRender = response.data.render.cart
 
-                const $el = document.querySelector(selector)
-                if ($el) {
-                    $el.innerHTML = htmlRender
-                }
-            }
+      for (const key in cartRender) {
+        const { selector, render } = cartRender[key]
+        const $element = document.querySelector(selector)
+
+        if ($element) {
+          $element.innerHTML = render
         }
+      }
     }
+  }
 }
