@@ -1,0 +1,14 @@
+{
+  "root": true,
+  "extends": [
+    "standard"
+  ],
+  "env": {
+    "browser": true
+  },
+  "globals": {
+    "ms3": "readonly",
+    "ms3Config": "readonly"
+  },
+  "ignorePatterns": ["**/node_modules/**", "**/mgr/**"]
+}
