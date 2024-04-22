@@ -1,7 +1,7 @@
 const ms3 = {
   config: {},
   init () {
-    this.config = window.ms3Config
+    this.config = document.ms3Config
     this.checkToken()
     ms3.form.init()
     ms3.cart.init()
