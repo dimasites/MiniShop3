@@ -205,6 +205,9 @@ class MiniShop3
             case 'customer/token/get':
                 $response = $this->customer->generateToken();
                 break;
+            case 'customer/token/update':
+                $response = $this->customer->updateToken($token);
+                break;
             case 'customer/get':
                 $this->customer->initialize($token);
                 $response = $this->customer->get();

@@ -296,9 +296,7 @@ class DBOrder extends DBStorage implements OrderInterface
             if (!$response['success']) {
                 return $this->error($response['message']);
             }
-
-            //TODO тут не должно быть рекурсии. Очистить поле в базе и памяти
-            $this->order = $this->remove($key);
+            $this->updateDraft($key);
             $response = $this->ms3->utils->invokeEvent('msOnRemoveFromOrder', [
                 'key' => $key,
                 'controller' => $this,
@@ -319,12 +317,17 @@ class DBOrder extends DBStorage implements OrderInterface
                 $this->order = $response['data']['order'];
             }
         }
-        //TODO учесть поля Customer
+        //TODO  Event before set
+        //TODO Сообрать массив возможных ошибок валидации
         foreach ($order as $key => $value) {
             $this->add($key, $value);
         }
+        // TODO event on set
 
-        return $this->get();
+        $data = [];
+        $this->order = $this->getOrder();
+        $data['order'] = $this->order;
+        return $this->success('ms3_order_set_success', $data);
     }
 
     public function submit(): array
@@ -340,13 +343,41 @@ class DBOrder extends DBStorage implements OrderInterface
 
     public function clean(): bool
     {
-        if (empty($this->order)) {
-            $response = $this->get();
-            if ($response['success']) {
-                $this->order = $response['data']['order'];
+        if (empty($this->draft)) {
+            $this->initDraft();
+        }
+        //TODO  Event before clean
+        foreach ($this->draft->Address->_fields as $key => $value) {
+            switch ($key) {
+                case 'id':
+                case 'order_id':
+                case 'user_id':
+                case 'createdon':
+                    break;
+                default:
+                    $this->draft->Address->set($key, null);
             }
         }
-        return true;
+        $this->draft->Address->save();
+        $this->draft->set('updatedon', time());
+
+        foreach ($this->draft->_fields as $key => $value) {
+            switch ($key) {
+                case 'id':
+                case 'user_id':
+                case 'token':
+                case 'createdon':
+                    break;
+                default:
+                    $this->draft->set($key, null);
+            }
+        }
+        $this->draft->set('updatedon', time());
+        $this->draft->save();
+
+        // TODO event on clean
+
+        return $this->success('ms3_order_clean_success');
     }
 
     protected function getOrder()

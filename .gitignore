@@ -1,2 +1,8 @@
 node_modules
-.vscode/
+config.core.php
+sftp-config.json
+.idea
+.DS_Store
+tests/properties.inc.php
+package-lock.json
+core/components/minishop3/vendor

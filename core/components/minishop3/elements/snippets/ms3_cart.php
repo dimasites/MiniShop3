@@ -15,6 +15,7 @@ use ModxPro\PdoTools\Fetch;
 if (isset($_POST['render'])) {
     unset($_POST['render']);
 }
+$modx->log(1, print_r($_SESSION['ms3'], 1));
 
 $ms3 = $modx->services->get('ms3');
 $ms3->initialize($modx->context->key);
