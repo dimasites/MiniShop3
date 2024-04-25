@@ -163,7 +163,7 @@ class MiniShop3
 
                 $data = json_encode($js_setting, JSON_UNESCAPED_UNICODE);
                 $this->modx->regClientStartupScript(
-                    '<script>ms3Config = ' . $data . ';</script>',
+                    '<script>document.ms3Config = ' . $data . ';</script>',
                     true
                 );
             }
